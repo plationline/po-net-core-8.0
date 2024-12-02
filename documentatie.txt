@@ -1,0 +1,56 @@
+Documentatie  kit PO5 .NET CORE 8.0
+
+I) SETARI PROIECT:
+
+	Pasul1: Adauga in proiect referinta: PO5_New/dll/Po.dll (cu specificatia urmatore: Po.dll treubie sa fie in acelasi folder cu celelalte dll-uri)
+	Pasul2: Adauga un Controller cu urmatoarele actiuni: PO5_kit/actions.txt
+	Pasul3: Adauga in Controller-ul create la Pasul2: PO5_kit/using.txt
+
+II) SETARI CONTROLLER:
+	In constructorul controller-ului care contine actiunile de la I.Pasul2 se completeaza campurile din class Po.Po po = new Po.Po() 
+		1)po.merchant_f_login 	|
+		2)po.merchant_publicKey	|
+		3)po.merchant_privateKey	| Datele se gasesc in contul de comerciant (https://merchants.plationline.ro/)
+		4)po.merchant_ivAuth		|
+		5)po.merchant_ivItsn		|
+		6)po.merchant_relay_response_f_relay_response_url (url-ul unde se intoarce raspunsul: ../controller/AuthorizationResponse)
+		7)po.merchant_relay_response_f_relay_method (PTOR/POST_S2S_PO_PAGE/POST_S2S_MT_PAGE/SOAP_PO_PAGE/SOAP_MT_PAGE).
+		8)po.merchant_relay_response_f_relay_handshake (1/0)
+		9)po.merchant_relay_response_f_post_declined   (1/0)
+	   10)po.log_path(se completeaza daca se doreste activarea logului pe operatiile PO)
+	   
+	Observatie: Cheile de securitate precum si restul de campuri de mai sus pot fi citite din fisiere corespunzatoare folosind functia: Po.Po.ReadFile(path);
+	
+III) DETALII ACTIUNI:
+
+	Fiecare actiune(Autorization/Query/Void/Settle/Refund/CancelReccurence) contine:
+		1.regiunea "set_..._fields" unde se populeaza proprietatile claselor necesare pentru fiecare actiune.
+		2.regiunea "..._request" unde se apeleaza metoda "Request" care populeaza o clasa de raspuns specifica fiecarei actiuni
+		3.regiunea "process_..._response" unde se proceseaza raspunsul preluat in clasa de mai sus
+		
+	Actiunea Authorization contine:
+	   1.regiunea "process_authorization_request" unde se proceseaz raspunsul preluata in clasa "po_auth_url_response",
+	   daca raspunsul nu contine erori se face redirect catre URL-ul preluat in clasa.
+
+	Actiunea AuthorizationResponse: 	
+		Dupa efectuare platii se primeste un raspuns criptatat in actiunea "AuthorizationResponse".
+		Acesta este decriptat si procesat in functie de metoda de primire a raspunsului autorizarii (post/soap)
+		setata in campul Po.Po.merchant_relay_response_f_relay_method.
+
+	Actiunea ITSN contine:
+		1.regiunea "get_itsn_request" unde se preia raspunsul de la server
+		2.regiunea "process_itsn_request" unde se decripteaza raspunsul de mai sus si se populeaza clasa "po_itsn" cu rezultatul
+		3.regiunea "set_query_fields(for itsn)" unde se populeaza proprietatile clasei "Query"
+		4.regiunea "query_request(for itsn)" unde se apeleaza metoda "Request" care populeaza  clasa de raspuns "po_query_response"
+		5.regiunea "process_query_response(for itsn)" unde se proceseaza raspunsul preluat in clasa de mai sus
+	
+	Pentru plata cu un card salvat trebuie sa executam:
+		1)TokenRequest de unde obtinem "token_trans_id" (autorizam o plata cu valoare = 0)
+	Pentru platile ulterioare cu cardul salvat mai sus:
+		2)TokenQuery cu "token_trans_id" si obtinem "token"
+		3)Authorization cu "token" (x_payment_token) pentru tranzactile ulterioare fara CVV2
+		
+	Pentru metoda CardOnFile trebuie sa executam:
+		1)CardOnFileTokenRequest de unde obtinem "token_trans_id"
+		2)CardOnFileTokenQuery cu "token_trans_id" si obtinem "token"
+		3)CardOnFileTokenAuthorization cu "token" pentru tranzactile ulterioare fara CVV2

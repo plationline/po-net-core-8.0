@@ -1,0 +1,1823 @@
+public static long token_trans_id = "";
+public static string token_order_id = "";
+public static string token = "";
+ 
+public ActionResult Authorization()
+{
+	Po.Po po = new Po.Po();
+
+	#region set_authorization_fields
+
+	po.Authorization.f_action = 2;
+	po.Authorization.f_amount = "1.01";
+	po.Authorization.f_currency = "RON";
+	po.Authorization.f_language = "RO";
+	po.Authorization.f_order_number = "1";
+	po.Authorization.f_order_string = "test";
+	po.Authorization.f_test_request = "1";
+	po.Authorization.x_payment_token = "";
+	
+	#region paylink
+	
+	po.Authorization.paylink = null;
+	//po.Authorization.paylink.email2client = "1";
+	//po.Authorization.paylink.sms2client = "0";
+	//po.Authorization.paylink.daysofvalability = 10;
+	//po.Authorization.paylink.stamp2expire = DateTime.Now.ToString("yyyy-MM-ddThh:mm:sszzz");
+
+	#endregion
+	#region card holder info
+
+	po.Authorization.card_holder_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.card_holder_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.card_holder_info.contact.f_phone = "0760000000";
+	po.Authorization.card_holder_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.card_holder_info.contact.f_send_sms = "1";
+	po.Authorization.card_holder_info.contact.f_first_name = "Test";
+	po.Authorization.card_holder_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.card_holder_info.address.f_company = "Companie de test";
+	po.Authorization.card_holder_info.address.f_zip = "000000";
+	po.Authorization.card_holder_info.address.f_country = "Romania";
+	po.Authorization.card_holder_info.address.f_state = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_city = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#region customer_info
+
+	#region contact
+	po.Authorization.customer_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.customer_info.contact.f_phone = "0760000000";
+	po.Authorization.customer_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.customer_info.contact.f_send_sms = "1";
+	po.Authorization.customer_info.contact.f_first_name = "Test";
+	po.Authorization.customer_info.contact.f_last_name = "PO5";
+	#endregion
+
+	#region invoice
+	po.Authorization.customer_info.invoice.f_company = "Companie de test";
+	po.Authorization.customer_info.invoice.f_cui = "000000";
+	po.Authorization.customer_info.invoice.f_reg_com = "J00/00/0000";
+	po.Authorization.customer_info.invoice.f_cnp = "1000000000000";
+	po.Authorization.customer_info.invoice.f_zip = "000000";
+	po.Authorization.customer_info.invoice.f_country = "Romania";
+	po.Authorization.customer_info.invoice.f_state = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_city = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_address = "Adresa test";
+	#endregion
+
+	#endregion
+
+	#region order_cart
+
+	#region items
+	
+	for (int i = 0; i < 2; i++)
+	{
+		Po.Requests.Authorization.Objects.item item = new Po.Requests.Authorization.Objects.item();
+		item.prodid = i.ToString();
+		item.name = "Produs " + i.ToString();
+		item.description = "Descriere " + i.ToString();
+		item.qty = "2";
+		item.itemprice = "0.505";
+		item.vat = "0.00";
+		item.stamp = DateTime.Now.ToString("yyyy-MM-dd");
+		item.prodtype_id = "0";
+
+		po.Authorization.f_order_cart.item.Add(item);
+	}
+
+	#endregion
+
+	#region coupons
+
+	for (int i = 0; i < 2; i++)
+	{
+		Po.Requests.Authorization.Objects.coupon coupon = new Po.Requests.Authorization.Objects.coupon();
+
+		coupon.key = "0002C";
+		coupon.value = "0.01";
+		coupon.percent = "1";
+		coupon.workingname = "Cupon reducere";
+		coupon.type = "0";
+		coupon.scop = "0";
+		coupon.vat = "0.00";
+
+		po.Authorization.f_order_cart.coupon.Add(coupon);
+	}
+
+	#endregion
+
+	#region shipping
+
+	po.Authorization.f_order_cart.shipping.name = "Shipping 1";
+	po.Authorization.f_order_cart.shipping.price = "1.01";
+	po.Authorization.f_order_cart.shipping.pimg = "1";
+	po.Authorization.f_order_cart.shipping.vat = "0.00";
+
+	#endregion
+
+	#endregion
+
+	#region shipping info
+
+	po.Authorization.shipping_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.shipping_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.shipping_info.contact.f_phone = "0760000000";
+	po.Authorization.shipping_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.shipping_info.contact.f_send_sms = "1";
+	po.Authorization.shipping_info.contact.f_first_name = "Test";
+	po.Authorization.shipping_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.shipping_info.address.f_company = "Companie de test";
+	po.Authorization.shipping_info.address.f_zip = "000000";
+	po.Authorization.shipping_info.address.f_country = "Romania";
+	po.Authorization.shipping_info.address.f_state = "Bucuresti";
+	po.Authorization.shipping_info.address.f_city = "Bucuresti";
+	po.Authorization.shipping_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#endregion
+
+	try
+	{
+		#region authorization_request
+		
+		po_auth_url_response _po_auth_url_response = po.Authorization.Request<po_auth_url_response>();
+
+		#endregion
+
+		#region process_authorization_response
+		
+		if (!po.Authorization.HasError)
+		{
+			if (_po_auth_url_response.po_error_code == "0")
+			{
+				Response.Redirect(_po_auth_url_response.po_redirect_url);
+			}
+			else
+			{
+				Response.Write(_po_auth_url_response.po_error_reason);
+			}
+		}
+		else
+		{
+			Response.Write(po.Authorization.GetError().Error);
+		}
+
+		#endregion
+	}
+	catch (Exception e)
+	{
+		Response.Write(e.Message);
+	}
+	return new EmptyResult();
+}
+
+public ActionResult AuthorizationResponse()
+{
+	try
+	{
+		Po.Po po = new Po.Po();
+	   
+		switch(po.Authorization.transaction_relay_response.f_relay_method)
+		{
+			#region 0.PTOR
+			case "PTOR":  //POST using JavaScript 
+				
+				string f_relay_message0 = Request["f_relay_message"];
+				string f_crypt_message0 = Request["f_crypt_message"];
+
+				po_auth_response response0 = (po_auth_response)po.Authorization.Response(f_relay_message0, f_crypt_message0);
+
+				switch (response0.x_response_code)
+				{
+					case "2":
+						//	authorized
+						Response.Write("<h2>The transaction was authorized!</h2>");
+						// please update the order status in your system
+						break;
+					case "13":
+						//	on hold
+						Response.Write("<h2>The transaction is on hold, additional checking is needed!</h2>");
+						// please update the order status in your system
+						break;
+					case "8":
+						//	declined
+						Response.Write("<h2>The transaction was declined!</h2>");
+						// please update the order status in your system
+						break;
+					case "10":
+						//	error
+						Response.Write("<h2>An error was encountered in authorization process</h2>");
+						// please update the order status in your system
+						break;
+				}
+				break;
+			#endregion
+
+			#region 1.POST_S2S_PO_PAGE 
+			case "POST_S2S_PO_PAGE": //POST server PO to merchant server, customer get the PO template
+				
+				string f_relay_message1 = Request["f_relay_message"];
+				string f_crypt_message1 = Request["f_crypt_message"];
+
+				po_auth_response response1 = (po_auth_response)po.Authorization.Response(f_relay_message1, f_crypt_message1);
+
+				bool raspuns_procesat1 = true;
+
+				switch(response1.x_response_code) {
+					case "2":
+						//	authorized
+						// please update the order status in your system
+						break;
+					case "13":
+						//	on hold
+						// please update the order status in your system
+						break;
+					case "8":
+						//	declined
+						// please update the order status in your system
+						break;
+					case "10":
+						//	error
+						// please update the order status in your system
+						break;
+					default:
+						raspuns_procesat1 = false;
+						break;
+				}
+
+				// this works for f_relay_handshake = 1 in authorization request. I want HANDSHAKE between merchant server and PO server for POST_S2S_PO_PAGE
+				// if the response was processed, I send TRUE to PO server for PO_Transaction_Response_Processing
+				// if the response was not processed and I want the PO server to resend the transaction status, I send RETRY to PO server for PO_Transaction_Response_Processing
+				if (po.Authorization.transaction_relay_response.f_relay_handshake == "1")
+				{
+					Response.AppendHeader("User-Agent", "Mozilla/5.0 (Plati Online Relay Response Service)");
+
+					if (raspuns_procesat1)
+					{
+						Response.AppendHeader("PO_Transaction_Response_Processing", "true");
+					}
+					else
+					{
+						Response.AppendHeader("PO_Transaction_Response_Processing", "retry");
+					}
+				}
+				break;
+			#endregion
+
+			#region 2.POST_S2S_MT_PAGE
+			case "POST_S2S_MT_PAGE": //POST server PO to merchant server, customer get the Merchant template 
+					
+				string f_relay_message2 = Request["f_relay_message"];
+				string f_crypt_message2 = Request["f_crypt_message"];
+
+				po_auth_response response2 = (po_auth_response)po.Authorization.Response(f_relay_message2, f_crypt_message2);
+
+				bool raspuns_procesat2 = true;
+
+				switch(response2.x_response_code) {
+					case "2":
+						//	authorized
+						// please update the order status in your system
+						break;
+					case "13":
+						//	on hold
+						// please update the order status in your system
+						break;
+					case "8":
+						//	declined
+						// please update the order status in your system
+						break;
+					case "10":
+						//	error
+						// please update the order status in your system
+						break;
+					default:
+						raspuns_procesat2 = false;
+						break;
+				}
+
+				// instead of sending a <h2> tag using echo, you can send an HTML code, based on X_RESPONSE_CODE
+				// this works for f_relay_handshake = 1 in authorization request. I want HANDSHAKE between merchant server and PO server for POST_S2S_MT_PAGE
+				// if the response was processed, I send TRUE to PO server for PO_Transaction_Response_Processing
+				// if the response was not processed and I want the PO server to resend the transaction status, I send RETRY to PO server for PO_Transaction_Response_Processing
+				if (po.Authorization.transaction_relay_response.f_relay_handshake == "1")
+				{
+					Response.AppendHeader("User-Agent", "Mozilla/5.0 (Plati Online Relay Response Service)");
+
+					if (raspuns_procesat2)
+					{
+						Response.AppendHeader("PO_Transaction_Response_Processing", "true");
+					}
+					else
+					{
+						Response.AppendHeader("PO_Transaction_Response_Processing", "retry");
+					}
+				}
+				break;
+			#endregion
+
+			#region 3.SOAP_PO_PAGE
+			case "SOAP_PO_PAGE"://POST SOAP server PO to merchant server, customer get the PO template 
+
+				string po_soap_response3 = "";
+				using (StreamReader rd = new StreamReader(Request.InputStream))
+				{
+					po_soap_response3 = rd.ReadToEnd();
+				}
+				if (po_soap_response3.Length > 0)
+				{
+					po_relay_response _po_relay_response3 = po.Authorization.SoapResponse(po_soap_response3);
+
+					po_auth_response response3 = (po_auth_response)po.Authorization.Response(_po_relay_response3.f_relay_message, _po_relay_response3.f_crypt_message);
+					bool raspuns_procesat3 = true;
+
+					switch (response3.x_response_code)
+					{
+						case "2":
+							//	authorized
+							// please update the order status in your system
+							break;
+						case "13":
+							//	on hold
+							// please update the order status in your system
+							break;
+						case "8":
+							//	declined
+							// please update the order status in your system
+							break;
+						case "10":
+							//	error
+							// please update the order status in your system
+							break;
+						default:
+							raspuns_procesat3 = false;
+							break;
+					}
+
+					// this works for f_relay_handshake = 1 in authorization request. I want HANDSHAKE between merchant server and PO server for SOAP_PO_PAGE
+					// if the response was processed, I send TRUE to PO server for PO_Transaction_Response_Processing
+					// if the response was not processed and I want the PO server to resend the transaction status, I send RETRY to PO server for PO_Transaction_Response_Processing
+					if (po.Authorization.transaction_relay_response.f_relay_handshake == "1")
+					{
+						Response.AppendHeader("User-Agent", "Mozilla/5.0 (Plati Online Relay Response Service)");
+
+						if (raspuns_procesat3)
+						{
+							Response.AppendHeader("PO_Transaction_Response_Processing", "true");
+						}
+						else
+						{
+							Response.AppendHeader("PO_Transaction_Response_Processing", "retry");
+						}
+					}
+				}
+			 
+				break;
+			#endregion
+
+			#region 4.SOAP_MT_PAGE
+			case "SOAP_MT_PAGE"://POST SOAP server PO to merchant server, customer get the Merchant template
+
+				string po_soap_response4 = "";
+				using (StreamReader rd = new StreamReader(Request.InputStream))
+				{
+					po_soap_response4 = rd.ReadToEnd();
+				}
+				if (po_soap_response4.Length > 0)
+				{
+					po_relay_response _po_relay_response4 = po.Authorization.SoapResponse(po_soap_response4);
+					po_auth_response response4 = (po_auth_response)po.Authorization.Response(_po_relay_response4.f_relay_message, _po_relay_response4.f_crypt_message);
+
+					bool raspuns_procesat4 = true;
+
+					switch (response4.x_response_code)
+					{
+						case "2":
+							//	authorized
+							// please update the order status in your system
+							break;
+						case "13":
+							//	on hold
+							// please update the order status in your system
+							break;
+						case "8":
+							//	declined
+							// please update the order status in your system
+							break;
+						case "10":
+							//	error
+							// please update the order status in your system
+							break;
+						default:
+							raspuns_procesat4 = false;
+							break;
+					}
+
+					// instead of sending a <h2> tag using echo, you can send an HTML code, based on X_RESPONSE_CODE
+
+					// this works for f_relay_handshake = 1 in authorization request. I want HANDSHAKE between merchant server and PO server for POST_S2S_MT_PAGE
+					// if the response was processed, I send TRUE to PO server for PO_Transaction_Response_Processing
+					// if the response was not processed and I want the PO server to resend the transaction status, I send RETRY to PO server for PO_Transaction_Response_Processing
+
+					if (po.Authorization.transaction_relay_response.f_relay_handshake == "1")
+					{
+						Response.AppendHeader("User-Agent", "Mozilla/5.0 (Plati Online Relay Response Service)");
+
+						if (raspuns_procesat4)
+						{
+							Response.AppendHeader("PO_Transaction_Response_Processing", "true");
+						}
+						else
+						{
+							Response.AppendHeader("PO_Transaction_Response_Processing", "retry");
+						}
+					}
+				}
+				break;
+			#endregion
+
+			#region 5.GET
+			//DISABLED imposible to use Plati Online 5.x
+			#endregion
+		}
+	}
+	catch (Exception e)
+	{
+		Response.Write(e);
+	}
+
+	return new EmptyResult();
+}
+
+public ActionResult Query()
+{
+	Po.Po po = new Po.Po();
+
+	#region set_query_fields
+
+	po.Query.f_order_number = "";
+	po.Query.x_trans_id = "";
+
+	#endregion
+
+	try
+	{
+		#region query_request
+		
+		po_query_response _po_query_response = po.Query.Request<po_query_response>();
+
+		#endregion
+
+		#region process_query_response
+		
+		if (!po.Query.HasError)
+		{
+
+			if (_po_query_response.po_error_code == "0")//0 - no error => '''Query Request XML_Message''' is valid and PlatiOnline will attempt to process the request.
+			{
+				switch (_po_query_response.order.tranzaction.status_fin1.code)
+				{
+					case "13":
+						Response.Write("<h2>The transaction status is on hold, additional checking is needed!</h2>");
+						// please update the order status in your system
+						break;
+					case "2":
+						Response.Write("<h2>The transaction status is authorized!</h2>");
+						// please update the order status in your system
+						break;
+					case "8":
+						Response.Write("<h2>The transaction status is declined!</h2>");
+						//please update the order status in your system
+						break;
+					case "3":
+						Response.Write("<h2>The transaction status is pending settle!</h2>");
+						// please update the order status in your system
+						break;
+					case "5":
+						/* Verify status_fin2 status*/
+						switch (_po_query_response.order.tranzaction.status_fin2.code)
+						{
+							case "1":
+								Response.Write("<h2>The transaction status is pending refund!</h2>");
+								// please update the order status in your system
+								break;
+							case "2":
+								Response.Write("<h2>The transaction status is refund!</h2>");
+								//please update the order status in your system
+								break;
+							case "3":
+								Response.Write("<h2>The transaction status is payment refused!</h2>");
+								// please update the order status in your system
+								break;
+							case "4":
+								Response.Write("<h2>The transaction status is settle!</h2>");
+								//please update the order status in your system
+								break;
+						}
+						break;
+					case "6":
+						Response.Write("<h2>The transaction status is pending void!</h2>");
+						//please update the order status in your system
+						break;
+					case "7":
+						Response.Write("<h2>The transaction status is voided!</h2>");
+						//please update the order status in your system
+						break;
+					case "9":
+						Response.Write("<h2>The transaction status is expired!</h2>");
+						//please update the order status in your system
+						break;
+					case "10":
+						Response.Write("<h2>The transaction status is error!</h2>");
+						//please update the order status in your system
+						break;
+					case "1":
+						Response.Write("<h2>The transaction status is pending authorization!</h2>");
+						//please update the order status in your system
+						break;
+					//default:
+					//  $stare1='<f_response_code>0</f_response_code>';			
+				}
+			}
+			else//1 - an error occurred parsing the '''Query Request XML_Message''' and PlatiOnline will not process the request;
+			{
+				Response.Write(_po_query_response.po_error_reason);
+			}
+		   
+		}
+		else
+		{
+			Response.Write(po.Query.GetError().Error);
+		}
+		#endregion
+
+	}
+	catch (Exception e)
+	{
+		Response.Write(e.Message);
+	}
+	return new EmptyResult();
+}
+
+public ActionResult Void()
+{
+	Po.Po po = new Po.Po();
+   
+	#region set_void_fields
+
+	po.Void.f_order_number = "";
+	po.Void.x_trans_id = "";
+
+	#endregion
+
+	try
+	{
+		#region void_request
+		
+		po_void_response _po_void_response = po.Void.Request<po_void_response>();
+
+		#endregion
+
+		#region process_void_response
+		
+		if (!po.Void.HasError)
+		{
+			if (_po_void_response.po_error_code == "0")
+			{
+				switch (_po_void_response.x_response_code) 
+				{
+					case "7":
+						Response.Write("<h2>Transaction successfully voided</h2>");
+						// please update the order status in your system
+						break;
+					case "10":
+						Response.Write("<h2>Errors occured, transaction NOT VOIDED</h2>");
+						break;
+				}
+			}
+			else
+			{
+				Response.Write("<h2>" + _po_void_response.po_error_reason + "</h2>");
+			}
+		}
+		else
+		{
+			Response.Write(po.Void.GetError().Error);
+		}
+
+		#endregion
+
+	}
+	catch (Exception e)
+	{
+		Response.Write(e.Message);
+	}
+	return new EmptyResult();
+}
+
+public ActionResult Settle()
+{
+	Po.Po po = new Po.Po();
+
+	#region set_settle_fields
+
+	po.Settle.f_order_number = "";
+	po.Settle.x_trans_id = "";
+	po.Settle.f_shipping_company = "";
+	po.Settle.f_awb = "";
+
+	#endregion
+
+	try
+	{
+		#region settle_request
+		
+		po_settle_response _po_settle_response = po.Settle.Request<po_settle_response>();
+
+		#endregion
+
+		#region process_settle_response
+		
+		if (!po.Settle.HasError)
+		{
+
+			if (_po_settle_response.po_error_code == "0")
+			{
+				switch (_po_settle_response.x_response_code)
+				{
+					case "3":
+						Response.Write("<h2>Transaction successfully settled</h2>");
+						// please update the order status in your system
+						break;
+					case "10":
+						Response.Write("<h2>Errors occured, transaction NOT SETTLED</h2>");
+						break;
+				}
+			}
+			else
+			{
+				Response.Write("<h2>" + _po_settle_response.po_error_reason + "</h2>");
+			}
+		}
+		else
+		{
+			Response.Write(po.Settle.GetError().Error);
+		}
+		#endregion
+
+	}
+	catch (Exception e)
+	{
+		Response.Write(e.Message);
+	}
+	return new EmptyResult();
+}
+
+public ActionResult Refund()
+{
+	Po.Po po = new Po.Po();
+
+	#region set_refund_fields
+
+	po.Refund.f_order_number = "";
+	po.Refund.f_amount = "";
+	po.Refund.x_trans_id = "";
+
+	#endregion
+
+	try
+	{
+		#region refund_request
+		
+		po_refund_response _po_refund_response = po.Refund.Request<po_refund_response>();
+
+		#endregion
+
+		#region process_refund_response
+		
+		if (!po.Refund.HasError)
+		{
+
+			if (_po_refund_response.po_error_code == "0")
+			{
+				switch (_po_refund_response.x_response_code)
+				{
+					case "1":
+						Response.Write("<h2>The amount of "+ _po_refund_response.f_amount +" successfully refunded</h2>");
+						// please update the order status in your system
+						break;
+					case "10":
+						Response.Write("<h2>Errors occured, transaction NOT REFUNDED</h2>");
+						break;
+				}
+			}
+			else
+			{
+
+				Response.Write("<h2>" + _po_refund_response.po_error_reason + "</h2>");
+			}
+		}
+		else
+		{
+			Response.Write(po.Refund.GetError().Error);
+		}
+
+		#endregion
+
+	}
+	catch (Exception e)
+	{
+		Response.Write(e.Message);
+	}
+	return new EmptyResult();
+}
+
+public ActionResult ITSN()
+{
+	Po.Po po = new Po.Po();
+
+	#region get_itsn_request
+	
+	string f_relay_message = Request["f_itsn_message"];
+	string f_crypt_message = Request["f_crypt_message"];
+
+	#endregion
+
+	try
+	{
+		#region process_itsn_request
+	
+		po_itsn _po_itsn = (po_itsn)po.Itsn.Response(f_relay_message, f_crypt_message);
+
+		#endregion
+
+		#region set_query_fields(for itsn)
+
+		po.Query.f_order_number = _po_itsn.f_order_number;
+		po.Query.x_trans_id = _po_itsn.x_trans_id;
+
+		#endregion
+
+		#region query_request(for itsn)
+		
+		po_query_response _po_query_response = po.Query.Request<po_query_response>();
+
+		#endregion
+
+		#region process_query_response(for itsn)
+		
+		if (!po.Query.HasError)
+		{
+			if (_po_query_response.po_error_code == "0")//0 - no error => '''Query Request XML_Message''' is valid and PlatiOnline will attempt to process the request.
+			{
+				#region Update order status
+				string f_response_code = "1";
+
+				switch (_po_query_response.order.tranzaction.status_fin1.code)
+				{
+					case "13":
+						Response.Write("<h2>The transaction status is on hold, additional checking is needed!</h2>");
+						// please update the order status in your system
+						break;
+					case "2":
+						Response.Write("<h2>The transaction status is authorized!</h2>");
+						// please update the order status in your system
+						break;
+					case "8":
+						Response.Write("<h2>The transaction status is declined!</h2>");
+						//please update the order status in your system
+						break;
+					case "3":
+						Response.Write("<h2>The transaction status is pending settle!</h2>");
+						// please update the order status in your system
+						break;
+					case "5":
+						/* Verify status_fin2 status*/
+						switch (_po_query_response.order.tranzaction.status_fin2.code)
+						{
+							case "1":
+								Response.Write("<h2>The transaction status is pending refund!</h2>");
+								// please update the order status in your system
+								break;
+							case "2":
+								Response.Write("<h2>The transaction status is refund!</h2>");
+								//please update the order status in your system
+								break;
+							case "3":
+								Response.Write("<h2>The transaction status is payment refused!</h2>");
+								// please update the order status in your system
+								break;
+							case "4":
+								Response.Write("<h2>The transaction status is settle!</h2>");
+								//please update the order status in your system
+								break;
+						}
+						break;
+					case "6":
+						Response.Write("<h2>The transaction status is pending void!</h2>");
+						//please update the order status in your system
+						break;
+					case "7":
+						Response.Write("<h2>The transaction status is voided!</h2>");
+						//please update the order status in your system
+						break;
+					case "9":
+						Response.Write("<h2>The transaction status is expired!</h2>");
+						//please update the order status in your system
+						break;
+					case "10":
+						Response.Write("<h2>The transaction status is error!</h2>");
+						//please update the order status in your system
+						break;
+					case "1":
+						Response.Write("<h2>The transaction status is pending authorization!</h2>");
+						//please update the order status in your system
+						break;
+					default:
+						   f_response_code = "0";
+						   break;
+				}
+
+				#endregion
+
+				#region Send ITSN response
+
+				XmlDocument doc = po.Itsn.ItsnResponse(f_response_code, _po_query_response.order.tranzaction.x_trans_id);
+				Response.Write(doc.OuterXml);
+
+				#endregion
+			}
+			else//1 - an error occurred parsing the '''Query Request XML_Message''' and PlatiOnline will not process the request;
+			{
+				Response.Write(_po_query_response.po_error_reason);
+			}
+		}
+		else
+		{
+			Response.Write(po.Query.GetError().Error);
+		}
+
+		#endregion
+
+	}
+	catch (Exception e)
+	{
+		Response.Write(e.Message);
+	}
+
+	return new EmptyResult();
+}
+
+public ActionResult CancelReccurence()
+{
+	Po.Po.merchant_f_login = "";
+	Po.Po.merchant_ivAuth = "";
+	Po.Po.merchant_publicKey = "";
+	
+	Po.Po po = new Po.Po();
+
+	#region set_cancel_reccurence_fields
+
+	po.CancelRecurrence.f_order_number = "";
+	po.CancelRecurrence.x_trans_id = "";
+
+	#endregion
+
+	try
+	{
+		#region cancel_reccurence_request
+
+		po_cancel_reccurence_response _po_cancel_reccurence_response = po.CancelRecurrence.Request<po_cancel_reccurence_response>();
+
+		#endregion
+
+		#region process_cancel_reccurence_response
+
+		if (!po.CancelRecurrence.HasError)
+		{
+			if (_po_cancel_reccurence_response.po_error_code == "0")
+			{
+				switch (_po_cancel_reccurence_response.x_response_code)
+				{
+					case "10":
+						response = "<h2>Errors occured, reccurencte not canceled</h2>";
+						break;
+					case "21":
+						response = "<h2>Reccurencte are successfully canceled</h2>";
+						break;
+				}
+			}
+			else
+			{
+				response = "<h2>" + _po_cancel_reccurence_response.po_error_reason + "</h2>";
+			}
+		}
+		else
+		{
+			response = po.CancelRecurrence.GetError().Error;
+		}
+
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	return new EmptyResult();
+}
+
+public ActionResult TokenRequest()
+{  
+	po.merchant_relay_response_f_relay_response_url = "AuthorizationResponse";
+	po.merchant_relay_response_f_relay_method = "PTOR";
+	po.merchant_relay_response_f_relay_handshake = "0";
+	po.merchant_relay_response_f_post_declined = "1";
+
+	#region set_authorization_fields
+
+	po.Authorization.f_action = 24;
+	po.Authorization.f_website = "www";
+	po.Authorization.f_amount = "0";
+	po.Authorization.f_currency = "RON";
+	po.Authorization.f_language = "RO";
+	po.Authorization.f_order_number = "101101";
+	po.Authorization.f_order_string = "Card verification";
+	po.Authorization.f_test_request = "1";
+	po.Authorization.paylink = null;
+	
+	token_order_id = po.Authorization.f_order_number;
+
+	#region card holder info
+
+	po.Authorization.card_holder_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.card_holder_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.card_holder_info.contact.f_phone = "0760000000";
+	po.Authorization.card_holder_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.card_holder_info.contact.f_send_sms = "1";
+	po.Authorization.card_holder_info.contact.f_first_name = "Test";
+	po.Authorization.card_holder_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.card_holder_info.address.f_company = "Companie de test";
+	po.Authorization.card_holder_info.address.f_zip = "000000";
+	po.Authorization.card_holder_info.address.f_country = "Romania";
+	po.Authorization.card_holder_info.address.f_state = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_city = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#region customer_info
+
+	#region contact
+	po.Authorization.customer_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.customer_info.contact.f_phone = "0760000000";
+	po.Authorization.customer_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.customer_info.contact.f_send_sms = "1";
+	po.Authorization.customer_info.contact.f_first_name = "Test";
+	po.Authorization.customer_info.contact.f_last_name = "TokenAuthorization";
+	#endregion
+
+	#region invoice
+	po.Authorization.customer_info.invoice.f_company = "Companie de test";
+	po.Authorization.customer_info.invoice.f_cui = "000000";
+	po.Authorization.customer_info.invoice.f_reg_com = "J00/00/0000";
+	po.Authorization.customer_info.invoice.f_cnp = "1000000000000";
+	po.Authorization.customer_info.invoice.f_zip = "000000";
+	po.Authorization.customer_info.invoice.f_country = "Romania";
+	po.Authorization.customer_info.invoice.f_state = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_city = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_address = "Adresa test";
+	#endregion
+
+	#endregion
+
+	#region order_cart
+
+	#region items
+
+	Po.Requests.Authorization.Objects.item item = new Po.Requests.Authorization.Objects.item();
+	item.prodid = "1";
+	item.name = "Produs 1";
+	item.description = "Descriere 1";
+	item.qty = "2";
+	item.itemprice = "1";
+	item.vat = "0.00";
+	item.stamp = DateTime.Now.ToString("yyyy-MM-dd");
+	item.prodtype_id = "0";
+
+	po.Authorization.f_order_cart.item.Add(item);
+   
+
+	#endregion
+
+	#region coupons
+
+	//for (int i = 0; i < 2; i++)
+	//{
+	//    Po.Requests.Authorization.Objects.coupon coupon = new Po.Requests.Authorization.Objects.coupon();
+
+	//    coupon.key = "0002C";
+	//    coupon.value = "0.01";
+	//    coupon.percent = "1";
+	//    coupon.workingname = "Cupon reducere";
+	//    coupon.type = "0";
+	//    coupon.scop = "0";
+	//    coupon.vat = "0.00";
+
+	//    po.Authorization.f_order_cart.coupon.Add(coupon);
+	//}
+
+	#endregion
+
+	#region shipping
+
+	po.Authorization.f_order_cart.shipping.name = "Shipping 1";
+	po.Authorization.f_order_cart.shipping.price = "0.00";
+	po.Authorization.f_order_cart.shipping.pimg = "1";
+	po.Authorization.f_order_cart.shipping.vat = "0.00";
+
+	#endregion
+
+	#endregion
+
+	#region shipping info
+
+	po.Authorization.shipping_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.shipping_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.shipping_info.contact.f_phone = "0760000000";
+	po.Authorization.shipping_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.shipping_info.contact.f_send_sms = "1";
+	po.Authorization.shipping_info.contact.f_first_name = "Test";
+	po.Authorization.shipping_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.shipping_info.address.f_company = "Companie de test";
+	po.Authorization.shipping_info.address.f_zip = "000000";
+	po.Authorization.shipping_info.address.f_country = "Romania";
+	po.Authorization.shipping_info.address.f_state = "Bucuresti";
+	po.Authorization.shipping_info.address.f_city = "Bucuresti";
+	po.Authorization.shipping_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#endregion
+
+	try
+	{
+		#region authorization_request
+
+		po_auth_url_response _po_auth_url_response = po.Authorization.Request<po_auth_url_response>();
+
+		#endregion
+
+		#region process_authorization_response
+
+		if (!po.Authorization.HasError)
+		{
+			if (_po_auth_url_response.po_error_code == "0")
+			{
+				token_trans_id = Convert.ToInt64(_po_auth_url_response.x_trans_id);
+
+				Response.Redirect(_po_auth_url_response.po_redirect_url);
+			}
+			else
+			{
+				response = _po_auth_url_response.po_error_reason;
+			}
+		}
+		else
+		{
+			response = po.Authorization.GetError().Error;
+		}
+
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	return new EmptyResult();
+}
+public ActionResult TokenQuery()
+{
+	string response = "";
+
+	#region set_query_fields
+
+	po.Query.f_order_number = token_order_id;
+	po.Query.x_trans_id = token_trans_id.ToString();
+	po.Query.x_request_payment_token = 1;
+
+	#endregion
+
+	try
+	{
+		#region query_request
+
+		Po.Requests.Query.Objects.po_query_response _po_query_response = po.Query.Request<Po.Requests.Query.Objects.po_query_response>();
+
+		#endregion
+		#region process_query_response
+
+		if (!po.Query.HasError)
+		{
+			if (_po_query_response.po_error_code == "0")//0 - no error => '''Query Request XML_Message''' is valid and PlatiOnline will attempt to process the request.
+			{
+			
+
+				#region MyRegion
+
+				switch (_po_query_response.order.tranzaction.status_fin1.code)
+				{
+					case "13":
+						//response = "<h2>The transaction status is on hold, additional checking is needed!</h2>";
+						// please update the order status in your system
+						break;
+					case "2":
+						//response = "<h2>The transaction status is authorized!</h2>";
+						// please update the order status in your system
+						break;
+					case "8":
+						//response = "<h2>The transaction status is declined!</h2>";
+						//please update the order status in your system
+						token = _po_query_response.po_payment_token.token;
+						break;
+					case "3":
+						//response = "<h2>The transaction status is pending settle!</h2>";
+						///please update the order status in your system
+						break;
+					case "5":
+						// Verify status_fin2 status
+						switch (_po_query_response.order.tranzaction.status_fin2.code)
+						{
+							case "1":
+								///response = "<h2>The transaction status is pending refund!</h2>";;
+								// please update the order status in your system
+								break;
+							case "2":
+								//response = "<h2>The transaction status is refund!</h2>";
+								//please update the order status in your system
+								break;
+							case "3":
+								//response = "<h2>The transaction status is payment refused!</h2>";
+								// please update the order status in your system
+								break;
+							case "4":
+								//response = "<h2>The transaction status is settle!</h2>";
+								//please update the order status in your system
+								break;
+						}
+						break;
+					case "6":
+						//response = "<h2>The transaction status is pending void!</h2>";
+						//please update the order status in your system
+						break;
+					case "7":
+						//response = "<h2>The transaction status is voided!</h2>";
+						//please update the order status in your system
+						break;
+					case "9":
+						//response = "<h2>The transaction status is expired!</h2>";
+						//please update the order status in your system
+						break;
+					case "10":
+						//response = "<h2>The transaction status is error!</h2>";
+						//please update the order status in your system
+						break;
+					case "1":
+						//response = "<h2>The transaction status is pending authorization!</h2>";
+						//please update the order status in your system
+						break;
+
+						#endregion
+				}
+
+				response = "Token: " + token;
+			}
+			else//1 - an error occurred parsing the '''Query Request XML_Message''' and PlatiOnline will not process the request;
+			{
+				response = _po_query_response.po_error_reason;
+			}
+		}
+		else
+		{
+			response = po.Query.GetError().Error;
+		}
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	return new EmptyResult();
+}
+
+public ActionResult TokenAuthorization()
+{
+	#region set_authorization_fields
+
+	po.AuthorizationToken.f_action = 25;
+	po.AuthorizationToken.f_order_string = "000001";//my_order_id
+	po.AuthorizationToken.f_order_number = "000001";//my_order_number
+	po.AuthorizationToken.x_trans_id = token_trans_id;
+	po.AuthorizationToken.f_amount = "1";
+	po.AuthorizationToken.f_currency = "RON";
+	po.AuthorizationToken.f_language = "RO";
+	po.AuthorizationToken.f_customer_ip = "";
+	po.AuthorizationToken.f_test_request = 1;
+	po.AuthorizationToken.x_payment_token = token;
+
+	#endregion
+
+	try
+	{
+		#region authorization_request_token
+
+		po_auth_by_token_response _po_auth_by_token_response = po.AuthorizationToken.Request<po_auth_by_token_response>();
+
+		#endregion
+
+		#region process_authorization_response_token
+
+		if (!po.AuthorizationToken.HasError)
+		{
+			switch (_po_auth_by_token_response.x_response_code)
+			{
+				case "2":
+					break;
+				case "6":
+					break;
+				case "8":
+					break;
+				case "10":
+					break;
+				case "13":
+					break;
+			}
+
+			///response = new JavaScriptSerializer().Serialize(_po_auth_by_token_response);
+			response = _po_auth_by_token_response.x_response_code + " : " + _po_auth_by_token_response.x_response_reason_text;
+		}
+		else
+		{
+			response = po.AuthorizationToken.GetError().Error;
+		}
+
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	return new EmptyResult();
+}
+
+public IActionResult CardOnFileTokenRequest()
+{
+	po.merchant_relay_response_f_relay_response_url = "AuthorizationResponse";
+	po.merchant_relay_response_f_relay_method = "PTOR";
+	po.merchant_relay_response_f_relay_handshake = "0";
+	po.merchant_relay_response_f_post_declined = "1";
+
+	#region set_authorization_fields
+
+	po.Authorization.f_action = 28;
+	po.Authorization.f_website = "www";
+	po.Authorization.f_amount = "1";
+	po.Authorization.f_currency = "RON";
+	po.Authorization.f_language = "RO";
+	po.Authorization.f_order_number = "101101";
+	po.Authorization.f_order_string = "Card verification";
+	po.Authorization.f_test_request = "0";
+
+	token_order_id = po.Authorization.f_order_number;
+
+	#region card holder info
+
+	po.Authorization.card_holder_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.card_holder_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.card_holder_info.contact.f_phone = "0760000000";
+	po.Authorization.card_holder_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.card_holder_info.contact.f_send_sms = "1";
+	po.Authorization.card_holder_info.contact.f_first_name = "Test";
+	po.Authorization.card_holder_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.card_holder_info.address.f_company = "Companie de test";
+	po.Authorization.card_holder_info.address.f_zip = "000000";
+	po.Authorization.card_holder_info.address.f_country = "Romania";
+	po.Authorization.card_holder_info.address.f_state = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_city = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#region customer_info
+
+	#region contact
+	po.Authorization.customer_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.customer_info.contact.f_phone = "0760000000";
+	po.Authorization.customer_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.customer_info.contact.f_send_sms = "1";
+	po.Authorization.customer_info.contact.f_first_name = "Test";
+	po.Authorization.customer_info.contact.f_last_name = "TokenAuthorization";
+	#endregion
+
+	#region invoice
+	po.Authorization.customer_info.invoice.f_company = "Companie de test";
+	po.Authorization.customer_info.invoice.f_cui = "000000";
+	po.Authorization.customer_info.invoice.f_reg_com = "J00/00/0000";
+	po.Authorization.customer_info.invoice.f_cnp = "1000000000000";
+	po.Authorization.customer_info.invoice.f_zip = "000000";
+	po.Authorization.customer_info.invoice.f_country = "Romania";
+	po.Authorization.customer_info.invoice.f_state = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_city = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_address = "Adresa test";
+	#endregion
+
+	#endregion
+
+	#region order_cart
+
+	#region items
+
+	Po.Requests.Authorization.Objects.item item = new Po.Requests.Authorization.Objects.item();
+	item.prodid = "1";
+	item.name = "Produs 1";
+	item.description = "Descriere 1";
+	item.qty = "2";
+	item.itemprice = "1";
+	item.vat = "0.00";
+	item.stamp = DateTime.Now.ToString("yyyy-MM-dd");
+	item.prodtype_id = "0";
+
+	po.Authorization.f_order_cart.item.Add(item);
+
+
+	#endregion
+
+	#region coupons
+
+	//for (int i = 0; i < 2; i++)
+	//{
+	//    Po.Requests.Authorization.Objects.coupon coupon = new Po.Requests.Authorization.Objects.coupon();
+
+	//    coupon.key = "0002C";
+	//    coupon.value = "0.01";
+	//    coupon.percent = "1";
+	//    coupon.workingname = "Cupon reducere";
+	//    coupon.type = "0";
+	//    coupon.scop = "0";
+	//    coupon.vat = "0.00";
+
+	//    po.Authorization.f_order_cart.coupon.Add(coupon);
+	//}
+
+	#endregion
+
+	#region shipping
+
+	po.Authorization.f_order_cart.shipping.name = "Shipping 1";
+	po.Authorization.f_order_cart.shipping.price = "0.00";
+	po.Authorization.f_order_cart.shipping.pimg = "1";
+	po.Authorization.f_order_cart.shipping.vat = "0.00";
+
+	#endregion
+
+	#endregion
+
+	#region shipping info
+
+	po.Authorization.shipping_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.shipping_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.shipping_info.contact.f_phone = "0760000000";
+	po.Authorization.shipping_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.shipping_info.contact.f_send_sms = "1";
+	po.Authorization.shipping_info.contact.f_first_name = "Test";
+	po.Authorization.shipping_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.shipping_info.address.f_company = "Companie de test";
+	po.Authorization.shipping_info.address.f_zip = "000000";
+	po.Authorization.shipping_info.address.f_country = "Romania";
+	po.Authorization.shipping_info.address.f_state = "Bucuresti";
+	po.Authorization.shipping_info.address.f_city = "Bucuresti";
+	po.Authorization.shipping_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#endregion
+
+	try
+	{
+		#region authorization_request
+
+		po_auth_url_response _po_auth_url_response = po.Authorization.Request<po_auth_url_response>();
+
+		#endregion
+
+		#region process_authorization_response
+
+		if (!po.Authorization.HasError)
+		{
+			if (_po_auth_url_response.po_error_code == "0")
+			{
+				token_trans_id = Convert.ToInt64(_po_auth_url_response.x_trans_id);
+
+				return Redirect(_po_auth_url_response.po_redirect_url);
+			}
+			else
+			{
+				response = _po_auth_url_response.po_error_reason;
+			}
+		}
+		else
+		{
+			response = po.Authorization.GetError().Error;
+		}
+
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	ViewData["actiune"] = "CardOnFileTokenRequest";
+	ViewData["response"] = response;
+
+	return View();
+}
+public IActionResult CardOnFileTokenQuery()
+{
+	string response = "";
+
+	#region set_query_fields
+
+	po.Query.f_order_number = token_order_id;
+	po.Query.x_trans_id = token_trans_id.ToString();
+	po.Query.x_request_payment_token = 1;
+
+	#endregion
+
+	try
+	{
+		#region validate_query
+
+		//po.ValidateObject(po.Query);
+
+		#endregion
+		#region query_request
+
+		Po.Requests.Query.Objects.po_query_response _po_query_response = po.Query.Request<Po.Requests.Query.Objects.po_query_response>();
+
+		#endregion
+		#region process_query_response
+
+		if (!po.Query.HasError)
+		{
+			if (_po_query_response.po_error_code == "0")//0 - no error => '''Query Request XML_Message''' is valid and PlatiOnline will attempt to process the request.
+			{
+				token = _po_query_response.po_payment_token.token;
+
+				#region MyRegion
+
+				switch (_po_query_response.order.tranzaction.status_fin1.code)
+				{
+					case "13":
+						//response = "<h2>The transaction status is on hold, additional checking is needed!</h2>";
+						// please update the order status in your system
+						break;
+					case "2":
+						//response = "<h2>The transaction status is authorized!</h2>";
+						// please update the order status in your system
+						break;
+					case "8":
+						//response = "<h2>The transaction status is declined!</h2>";
+						//please update the order status in your system
+						break;
+					case "3":
+						//response = "<h2>The transaction status is pending settle!</h2>";
+						///please update the order status in your system
+						break;
+					case "5":
+						// Verify status_fin2 status
+						switch (_po_query_response.order.tranzaction.status_fin2.code)
+						{
+							case "1":
+								///response = "<h2>The transaction status is pending refund!</h2>";;
+								// please update the order status in your system
+								break;
+							case "2":
+								//response = "<h2>The transaction status is refund!</h2>";
+								//please update the order status in your system
+								break;
+							case "3":
+								//response = "<h2>The transaction status is payment refused!</h2>";
+								// please update the order status in your system
+								break;
+							case "4":
+								//response = "<h2>The transaction status is settle!</h2>";
+								//please update the order status in your system
+								break;
+						}
+						break;
+					case "6":
+						//response = "<h2>The transaction status is pending void!</h2>";
+						//please update the order status in your system
+						break;
+					case "7":
+						//response = "<h2>The transaction status is voided!</h2>";
+						//please update the order status in your system
+						break;
+					case "9":
+						//response = "<h2>The transaction status is expired!</h2>";
+						//please update the order status in your system
+						break;
+					case "10":
+						//response = "<h2>The transaction status is error!</h2>";
+						//please update the order status in your system
+						break;
+					case "1":
+						//response = "<h2>The transaction status is pending authorization!</h2>";
+						//please update the order status in your system
+						break;
+
+						#endregion
+				}
+
+				response = "Token: " + token;
+			}
+			else//1 - an error occurred parsing the '''Query Request XML_Message''' and PlatiOnline will not process the request;
+			{
+				response = _po_query_response.po_error_reason;
+			}
+		}
+		else
+		{
+			response = po.Query.GetError().Error;
+		}
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	ViewData["actiune"] = "CardOnFileTokenQuery";
+	ViewData["response"] = response;
+
+	return View();
+}
+public IActionResult CardOnFileTokenAuthorization()
+{
+	po.merchant_relay_response_f_relay_response_url = "AuthorizationResponse";
+	po.merchant_relay_response_f_relay_method = "PTOR";
+	po.merchant_relay_response_f_relay_handshake = "0";
+	po.merchant_relay_response_f_post_declined = "1";
+
+	#region set_authorization_fields
+
+	po.Authorization.f_action = 2;
+	po.Authorization.f_website = "www";
+	po.Authorization.f_amount = "1";
+	po.Authorization.f_currency = "RON";
+	po.Authorization.f_language = "RO";
+	po.Authorization.f_order_number = "101101";
+	po.Authorization.f_order_string = "Card verification";
+	po.Authorization.f_test_request = "0";
+	po.Authorization.x_payment_token = token;
+
+	#region card holder info
+
+	po.Authorization.card_holder_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.card_holder_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.card_holder_info.contact.f_phone = "0760000000";
+	po.Authorization.card_holder_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.card_holder_info.contact.f_send_sms = "1";
+	po.Authorization.card_holder_info.contact.f_first_name = "Test";
+	po.Authorization.card_holder_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.card_holder_info.address.f_company = "Companie de test";
+	po.Authorization.card_holder_info.address.f_zip = "000000";
+	po.Authorization.card_holder_info.address.f_country = "Romania";
+	po.Authorization.card_holder_info.address.f_state = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_city = "Bucuresti";
+	po.Authorization.card_holder_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#region customer_info
+
+	#region contact
+	po.Authorization.customer_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.customer_info.contact.f_phone = "0760000000";
+	po.Authorization.customer_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.customer_info.contact.f_send_sms = "1";
+	po.Authorization.customer_info.contact.f_first_name = "Test";
+	po.Authorization.customer_info.contact.f_last_name = "TokenAuthorization";
+	#endregion
+
+	#region invoice
+	po.Authorization.customer_info.invoice.f_company = "Companie de test";
+	po.Authorization.customer_info.invoice.f_cui = "000000";
+	po.Authorization.customer_info.invoice.f_reg_com = "J00/00/0000";
+	po.Authorization.customer_info.invoice.f_cnp = "1000000000000";
+	po.Authorization.customer_info.invoice.f_zip = "000000";
+	po.Authorization.customer_info.invoice.f_country = "Romania";
+	po.Authorization.customer_info.invoice.f_state = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_city = "Bucuresti";
+	po.Authorization.customer_info.invoice.f_address = "Adresa test";
+	#endregion
+
+	#endregion
+
+	#region order_cart
+
+	#region items
+
+	Po.Requests.Authorization.Objects.item item = new Po.Requests.Authorization.Objects.item();
+	item.prodid = "1";
+	item.name = "Produs 1";
+	item.description = "Descriere 1";
+	item.qty = "2";
+	item.itemprice = "1";
+	item.vat = "0.00";
+	item.stamp = DateTime.Now.ToString("yyyy-MM-dd");
+	item.prodtype_id = "0";
+
+	po.Authorization.f_order_cart.item.Add(item);
+
+
+	#endregion
+
+	#region coupons
+
+	//for (int i = 0; i < 2; i++)
+	//{
+	//    Po.Requests.Authorization.Objects.coupon coupon = new Po.Requests.Authorization.Objects.coupon();
+
+	//    coupon.key = "0002C";
+	//    coupon.value = "0.01";
+	//    coupon.percent = "1";
+	//    coupon.workingname = "Cupon reducere";
+	//    coupon.type = "0";
+	//    coupon.scop = "0";
+	//    coupon.vat = "0.00";
+
+	//    po.Authorization.f_order_cart.coupon.Add(coupon);
+	//}
+
+	#endregion
+
+	#region shipping
+
+	po.Authorization.f_order_cart.shipping.name = "Shipping 1";
+	po.Authorization.f_order_cart.shipping.price = "0.00";
+	po.Authorization.f_order_cart.shipping.pimg = "1";
+	po.Authorization.f_order_cart.shipping.vat = "0.00";
+
+	#endregion
+
+	#endregion
+
+	#region shipping info
+
+	po.Authorization.shipping_info.same_info_as = "1";
+
+	#region contact
+
+	po.Authorization.shipping_info.contact.f_email = "test@plationline.eu";
+	po.Authorization.shipping_info.contact.f_phone = "0760000000";
+	po.Authorization.shipping_info.contact.f_mobile_number = "0760000000";
+	po.Authorization.shipping_info.contact.f_send_sms = "1";
+	po.Authorization.shipping_info.contact.f_first_name = "Test";
+	po.Authorization.shipping_info.contact.f_last_name = "PO5";
+
+	#endregion
+
+	#region address
+
+	po.Authorization.shipping_info.address.f_company = "Companie de test";
+	po.Authorization.shipping_info.address.f_zip = "000000";
+	po.Authorization.shipping_info.address.f_country = "Romania";
+	po.Authorization.shipping_info.address.f_state = "Bucuresti";
+	po.Authorization.shipping_info.address.f_city = "Bucuresti";
+	po.Authorization.shipping_info.address.f_address = "Adresa test";
+
+	#endregion
+
+	#endregion
+
+	#endregion
+
+	try
+	{
+		#region authorization_request
+
+		po_auth_url_response _po_auth_url_response = po.Authorization.Request<po_auth_url_response>();
+
+		#endregion
+
+		#region process_authorization_response
+
+		if (!po.Authorization.HasError)
+		{
+			if (_po_auth_url_response.po_error_code == "0")
+			{
+				token_trans_id = Convert.ToInt64(_po_auth_url_response.x_trans_id);
+
+				Response.Redirect(_po_auth_url_response.po_redirect_url);
+			}
+			else
+			{
+				response = _po_auth_url_response.po_error_reason;
+			}
+		}
+		else
+		{
+			response = po.Authorization.GetError().Error;
+		}
+
+		#endregion
+	}
+	catch (Exception e)
+	{
+		response = e.Message;
+	}
+
+	ViewData["actiune"] = "CardOnFileTokenAuthorization";
+	ViewData["response"] = response;
+
+	return View();
+}
